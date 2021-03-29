@@ -1,0 +1,74 @@
+package com.algaworks.algafoog.auth;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
+import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
+
+@Configuration
+@EnableAuthorizationServer
+public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private UserDetailsService userDetailsService;
+	
+	@Override
+	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+		clients.inMemory()
+				.withClient("algafood-web")
+				.secret(passwordEncoder.encode("web123"))
+				.authorizedGrantTypes("password", "refresh_token")
+				.scopes("write", "read")
+				/*
+				 * access_token: valor em segundos e padrão é de 12 horas.
+				 */
+				.accessTokenValiditySeconds(60)
+				/*
+				 * refresh_token: valor em segundos e padrão é de 30 dias.
+				 */
+				.refreshTokenValiditySeconds(60 * 3)
+			.and()
+				.withClient("algafood-mobile")
+				.secret(passwordEncoder.encode("mobile123"))
+				.authorizedGrantTypes("password")
+				.scopes("write", "read")
+				.accessTokenValiditySeconds(60 * 60 * 6) // setado para 6 horas
+				.accessTokenValiditySeconds(60 * 60 * 24 * 60) // setado para 60 dias
+			.and()
+				/*
+				 * configuração de acesso do resource server ao authorization server
+				 */
+				.withClient("algafood-check-token")
+				.secret(passwordEncoder.encode("check123"));
+	}
+	
+	@Override
+	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		endpoints
+			.authenticationManager(authenticationManager)
+			.userDetailsService(userDetailsService)
+			/*
+			 * inutilizando o reuso do refresh token.
+			 */
+			.reuseRefreshTokens(false);
+	}
+	
+	@Override
+	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+//		security.checkTokenAccess("isAuthenticated()");
+		security.checkTokenAccess("permitAll()");
+	}
+		
+}
