@@ -26,26 +26,47 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-		clients.inMemory()
+		clients
+			.inMemory()
 				.withClient("algafood-web")
 				.secret(passwordEncoder.encode("web123"))
+				/*
+				 * configuração para usar o fluxo password + refresh-token
+				 */
 				.authorizedGrantTypes("password", "refresh_token")
 				.scopes("write", "read")
 				/*
+				 * configuração para definir o tempo de vida do access-token para 1 minutos
 				 * access_token: valor em segundos e padrão é de 12 horas.
 				 */
 				.accessTokenValiditySeconds(60)
 				/*
+				 * configuração para definir o tempo de vida do refresh-token para 3 minutos
 				 * refresh_token: valor em segundos e padrão é de 30 dias.
 				 */
 				.refreshTokenValiditySeconds(60 * 3)
+			.and()
+				.withClient("algafood-backend")
+				.secret(passwordEncoder.encode("back123"))
+				/*
+				 * configuração para usar o fluxo client_credentials
+				 * deixando o tempo de vida do access-token padrão 
+				 */
+				.authorizedGrantTypes("client_credentials")
+				.scopes("write", "read")
 			.and()
 				.withClient("algafood-mobile")
 				.secret(passwordEncoder.encode("mobile123"))
 				.authorizedGrantTypes("password")
 				.scopes("write", "read")
-				.accessTokenValiditySeconds(60 * 60 * 6) // setado para 6 horas
-				.accessTokenValiditySeconds(60 * 60 * 24 * 60) // setado para 60 dias
+				/*
+				 * configuração para definir o tempo de vida do refresh-token para 6 horas
+				 */
+				.accessTokenValiditySeconds(60 * 60 * 6)
+				/*
+				 * configuração para definir o tempo de vida do refresh-token para 60 dias
+				 */
+				.accessTokenValiditySeconds(60 * 60 * 24 * 60)
 			.and()
 				/*
 				 * configuração de acesso do resource server ao authorization server
