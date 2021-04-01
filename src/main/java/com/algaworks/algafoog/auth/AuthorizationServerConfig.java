@@ -45,15 +45,28 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				 * refresh_token: valor em segundos e padrão é de 30 dias.
 				 */
 				.refreshTokenValiditySeconds(60 * 3)
+				
 			.and()
-				.withClient("algafood-backend")
-				.secret(passwordEncoder.encode("back123"))
+				.withClient("faturamento")
+				.secret(passwordEncoder.encode("faturamento123"))
 				/*
 				 * configuração para usar o fluxo client_credentials
 				 * deixando o tempo de vida do access-token padrão 
 				 */
 				.authorizedGrantTypes("client_credentials")
 				.scopes("write", "read")
+				
+			.and()
+				.withClient("foodanalytics")
+				.secret(passwordEncoder.encode("food123"))
+				/*
+				 * configuração para usar o fluxo authorization_code
+				 * deixando o tempo de vida do access-token padrão 
+				 */
+				.authorizedGrantTypes("authorization_code")
+				.scopes("write", "read")
+				.redirectUris("http://aplicacao-cliente")
+				
 			.and()
 				.withClient("algafood-mobile")
 				.secret(passwordEncoder.encode("mobile123"))
@@ -67,6 +80,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				 * configuração para definir o tempo de vida do refresh-token para 60 dias
 				 */
 				.accessTokenValiditySeconds(60 * 60 * 24 * 60)
+				
 			.and()
 				/*
 				 * configuração de acesso do resource server ao authorization server
