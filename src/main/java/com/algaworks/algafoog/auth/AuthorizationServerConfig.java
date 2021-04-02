@@ -31,7 +31,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.withClient("algafood-web")
 				.secret(passwordEncoder.encode("web123"))
 				/*
-				 * configuração para usar o fluxo password + refresh-token
+				 * configuração para usar o fluxo password grant_type + refresh-token
 				 */
 				.authorizedGrantTypes("password", "refresh_token")
 				.scopes("write", "read")
@@ -50,7 +50,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.withClient("faturamento")
 				.secret(passwordEncoder.encode("faturamento123"))
 				/*
-				 * configuração para usar o fluxo client_credentials
+				 * configuração para usar o fluxo client_credentials grant_type
 				 * deixando o tempo de vida do access-token padrão 
 				 */
 				.authorizedGrantTypes("client_credentials")
@@ -60,12 +60,23 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				.withClient("foodanalytics")
 				.secret(passwordEncoder.encode("food123"))
 				/*
-				 * configuração para usar o fluxo authorization_code
+				 * configuração para usar o fluxo authorization_code grant_type
 				 * deixando o tempo de vida do access-token padrão 
 				 */
 				.authorizedGrantTypes("authorization_code")
 				.scopes("write", "read")
 				.redirectUris("http://www.foodanalytics.local:8082")
+				
+			.and()
+				.withClient("logistica")
+				/*
+				 * configuração para usar o fluxo implicit grant_type
+				 * não requer autenticação do cliente
+				 * deixando o tempo de vida do access-token padrão 
+				 */
+				.authorizedGrantTypes("implicit")
+				.scopes("write", "read")
+				.redirectUris("http://www.foodlogistics.local:8082")	
 				
 			.and()
 				.withClient("algafood-mobile")
