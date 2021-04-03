@@ -62,7 +62,11 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				
 			.and()
 				.withClient("foodanalytics")
-				.secret(passwordEncoder.encode("food123"))
+				/*
+				 * configurando para não precisar passar o client_secret como query params
+				 * usando o PKCE 
+				 */
+				.secret(passwordEncoder.encode(""))
 				/*
 				 * configuração para usar o fluxo authorization_code grant_type
 				 * deixando o tempo de vida do access-token padrão 
