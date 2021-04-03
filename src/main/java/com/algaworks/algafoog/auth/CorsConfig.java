@@ -1,4 +1,5 @@
 package com.algaworks.algafoog.auth;
+
 /*
  * Fonte: https://spring.io/blog/2015/06/08/cors-support-in-spring-framework#filter-based-cors-support
  */
