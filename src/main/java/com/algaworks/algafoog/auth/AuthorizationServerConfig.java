@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,6 +15,8 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
+import org.springframework.security.oauth2.provider.token.TokenStore;
+import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 
 @Configuration
 @EnableAuthorizationServer
@@ -27,6 +30,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private RedisConnectionFactory redisConnectionFactory;
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -117,12 +123,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			 * configuração para inutilizar o reuso do refresh token.
 			 */
 			.reuseRefreshTokens(false)
+			.tokenStore(redisTokenStore())
 			/*
 			 * configuração para usar o pkce
 			 */
-			.tokenGranter(tokenGranter(endpoints));;
+			.tokenGranter(tokenGranter(endpoints));
 	}
-	
+
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 //		security.checkTokenAccess("isAuthenticated()");
@@ -145,6 +152,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				pkceAuthorizationCodeTokenGranter, endpoints.getTokenGranter());
 		
 		return new CompositeTokenGranter(granters);
+	}
+	
+	private TokenStore redisTokenStore() {
+		return new RedisTokenStore(redisConnectionFactory);
 	}
 		
 }
