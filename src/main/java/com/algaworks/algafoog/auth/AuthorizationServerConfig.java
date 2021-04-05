@@ -3,8 +3,8 @@ package com.algaworks.algafoog.auth;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -15,8 +15,7 @@ import org.springframework.security.oauth2.config.annotation.web.configurers.Aut
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
+import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 
 @Configuration
 @EnableAuthorizationServer
@@ -30,9 +29,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
-	
-	@Autowired
-	private RedisConnectionFactory redisConnectionFactory;
+
+	/*
+	 * Desabilitado temporariamente
+	 * configuração para usar o redis para armazenar os tokens
+	 */
+//	@Autowired
+//	private RedisConnectionFactory redisConnectionFactory;
 	
 	@Override
 	public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
@@ -123,7 +126,15 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			 * configuração para inutilizar o reuso do refresh token.
 			 */
 			.reuseRefreshTokens(false)
-			.tokenStore(redisTokenStore())
+			/*
+			 * configuração de conversor de access_token para jwt (tokens transparentes)
+			 */
+			.accessTokenConverter(jwtAccessTokenConverter())
+			/*
+			 * Desabilitado temporariamente
+			 * configuração para usar o redis para armazenar os tokens
+			 */
+//			.tokenStore(redisTokenStore())
 			/*
 			 * configuração para usar o pkce
 			 */
@@ -140,6 +151,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			.allowFormAuthenticationForClients();
 	}
 	
+	@Bean
+	public JwtAccessTokenConverter jwtAccessTokenConverter() {
+		JwtAccessTokenConverter jwtAccessTokenConverter = new JwtAccessTokenConverter();
+		jwtAccessTokenConverter.setSigningKey("algaworks");
+		
+		return jwtAccessTokenConverter;
+	}
+	
 	/*
 	 * Método para suportar o PKCE no projeto
 	 */
@@ -153,9 +172,13 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		
 		return new CompositeTokenGranter(granters);
 	}
-	
-	private TokenStore redisTokenStore() {
-		return new RedisTokenStore(redisConnectionFactory);
-	}
+
+	/*
+	 * Desabilitado temporariamente
+	 * configuração para usar o redis para armazenar os tokens
+	 */
+//	private TokenStore redisTokenStore() {
+//		return new RedisTokenStore(redisConnectionFactory);
+//	}
 		
 }
