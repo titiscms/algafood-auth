@@ -32,6 +32,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Autowired
 	private UserDetailsService userDetailsService;
+	
+	@Autowired
+	private JwtKeyStoreProperties jwtKeyStoreProperties;
 
 	/*
 	 * Desabilitado temporariamente
@@ -147,11 +150,16 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	@Override
 	public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
 //		security.checkTokenAccess("isAuthenticated()");
-		security.checkTokenAccess("permitAll()")
-			/*
-			 * configuração para permitir passar a autenticação via query params na url.
-			 */
-			.allowFormAuthenticationForClients();
+		security
+			.checkTokenAccess("permitAll()")
+				/*
+				 * configuração para liberar acesso que retorna a chave publica 
+				 */
+				.tokenKeyAccess("permitAll()")
+				/*
+				 * configuração para permitir passar a autenticação via query params na url.
+				 */
+				.allowFormAuthenticationForClients();
 	}
 	
 	@Bean
@@ -165,9 +173,9 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 		/*
 		 * configuração para trabalhar com chave assimétrica
 		 */
-		ClassPathResource jksResource = new ClassPathResource("/keystores/algafood.jks");
-		String keyStorePass = "123456";
-		String keyPairAlias = "algafood";
+		ClassPathResource jksResource = new ClassPathResource(jwtKeyStoreProperties.getPath());
+		String keyStorePass = jwtKeyStoreProperties.getPassword();
+		String keyPairAlias = jwtKeyStoreProperties.getAlias();
 		
 		KeyStoreKeyFactory keyStoreKeyFactory = new KeyStoreKeyFactory(jksResource, keyStorePass.toCharArray());
 		KeyPair keyPair = keyStoreKeyFactory.getKeyPair(keyPairAlias);
