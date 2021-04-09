@@ -1,4 +1,4 @@
-package com.algaworks.algafoog.auth;
+package com.algaworks.algafoog.auth.core;
 
 import javax.validation.constraints.NotBlank;
 

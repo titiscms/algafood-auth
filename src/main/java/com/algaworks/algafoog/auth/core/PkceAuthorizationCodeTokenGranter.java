@@ -1,4 +1,4 @@
-package com.algaworks.algafoog.auth;
+package com.algaworks.algafoog.auth.core;
 
 /*
  * Solução baseada em: https://github.com/spring-projects/spring-security-oauth/pull/675/files

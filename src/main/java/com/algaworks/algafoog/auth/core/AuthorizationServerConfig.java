@@ -1,4 +1,4 @@
-package com.algaworks.algafoog.auth;
+package com.algaworks.algafoog.auth.core;
 
 import java.security.KeyPair;
 import java.util.Arrays;
