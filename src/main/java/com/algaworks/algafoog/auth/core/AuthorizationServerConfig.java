@@ -19,6 +19,7 @@ import org.springframework.security.oauth2.provider.CompositeTokenGranter;
 import org.springframework.security.oauth2.provider.TokenGranter;
 import org.springframework.security.oauth2.provider.approval.ApprovalStore;
 import org.springframework.security.oauth2.provider.approval.TokenApprovalStore;
+import org.springframework.security.oauth2.provider.token.TokenEnhancerChain;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFactory;
@@ -128,6 +129,12 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 	
 	@Override
 	public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {
+		/*
+		 * Instanciação de cadeia de incremento do token
+		 */
+		TokenEnhancerChain enharcerChain = new TokenEnhancerChain();
+		enharcerChain.setTokenEnhancers(Arrays.asList(new JwtCustomClaimsTokenEnhancer(), jwtAccessTokenConverter()));
+		
 		endpoints
 			.authenticationManager(authenticationManager)
 			.userDetailsService(userDetailsService)
@@ -139,6 +146,10 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 			 * configuração de conversor de access_token para jwt (tokens transparentes)
 			 */
 			.accessTokenConverter(jwtAccessTokenConverter())
+			/*
+			 * configuração para customizar as informações no payload do token
+			 */
+			.tokenEnhancer(enharcerChain)
 			/*
 			 * Configuração de aprovação granular dos escopos
 			 */
