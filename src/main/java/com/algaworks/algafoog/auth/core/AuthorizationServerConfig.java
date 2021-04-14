@@ -28,6 +28,10 @@ import org.springframework.security.oauth2.provider.token.store.KeyStoreKeyFacto
 @EnableAuthorizationServer
 public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdapter {
 
+	private static final String SCOPE_TYPE_READ = "READ";
+
+	private static final String SCOPE_TYPE_WRITE = "WRITE";
+
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
@@ -57,7 +61,7 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				 * configuração para usar o fluxo password grant_type + refresh-token
 				 */
 				.authorizedGrantTypes("password", "refresh_token")
-				.scopes("write", "read")
+				.scopes(SCOPE_TYPE_WRITE, SCOPE_TYPE_READ)
 				/*
 				 * configuração para definir o tempo de vida do access-token para 1 minutos
 				 * access_token: valor em segundos e padrão é de 12 horas.
@@ -77,7 +81,18 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				 * deixando o tempo de vida do access-token padrão 
 				 */
 				.authorizedGrantTypes("client_credentials")
-				.scopes("write", "read")
+				.scopes(SCOPE_TYPE_WRITE, SCOPE_TYPE_READ)
+				
+			.and()
+				.withClient("foodanalyticssimple")
+				.secret(passwordEncoder.encode("food123"))
+				/*
+				 * configuração para usar o fluxo authorization_code grant_type
+				 * deixando o tempo de vida do access-token padrão 
+				 */
+				.authorizedGrantTypes("authorization_code")
+				.scopes(SCOPE_TYPE_WRITE, SCOPE_TYPE_READ)
+				.redirectUris("http://www.foodanalytics.local:8082")
 				
 			.and()
 				.withClient("foodanalytics")
@@ -91,8 +106,8 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				 * deixando o tempo de vida do access-token padrão 
 				 */
 				.authorizedGrantTypes("authorization_code")
-				.scopes("write", "read")
-				.redirectUris("http://www.foodanalytics.local:8082")
+				.scopes(SCOPE_TYPE_WRITE, SCOPE_TYPE_READ)
+				.redirectUris("http://www.foodanalytics.local:8082")	
 				
 			.and()
 				.withClient("logistica")
@@ -102,14 +117,14 @@ public class AuthorizationServerConfig extends AuthorizationServerConfigurerAdap
 				 * deixando o tempo de vida do access-token padrão 
 				 */
 				.authorizedGrantTypes("implicit")
-				.scopes("write", "read")
+				.scopes(SCOPE_TYPE_WRITE, SCOPE_TYPE_READ)
 				.redirectUris("http://www.foodlogistics.local:8082")	
 				
 			.and()
 				.withClient("algafood-mobile")
 				.secret(passwordEncoder.encode("mobile123"))
 				.authorizedGrantTypes("password")
-				.scopes("write", "read")
+				.scopes(SCOPE_TYPE_WRITE, SCOPE_TYPE_READ)
 				/*
 				 * configuração para definir o tempo de vida do refresh-token para 6 horas
 				 */
